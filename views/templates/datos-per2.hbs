@@ -1,0 +1,192 @@
+<div class="container">
+
+    <div class="stepwizard">
+        <div class="stepwizard-row setup-panel">
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle">1</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">2</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">3</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-success btn-circle" disabled="disabled">4</a>
+                
+            </div>
+
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">5</a>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-md-center align-items-center">
+        <aside class="col-sm-4">
+        <article class="card-body ">
+            <h4 class="card-title text-center mb-4 mt-1">Ingrese datos del paciente</h4>
+            <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <label>Nombre</label>
+                </div> <!-- input-group.// -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txtnombre" onkeypress="return soloLetras(event)">
+                </div>
+            </div> <!-- form-group// -->
+
+            <div class="form-group">
+                <div class="input-group">
+                    <label>Apellido paterno</label>
+                </div> <!-- input-group.// -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txtapat" onkeypress="return soloLetras(event)">
+                </div>
+            </div> 
+
+            <div class="form-group">
+                <div class="input-group">
+                    <label>Apellido Materno</label>
+                </div> <!-- input-group.// -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txtamat" onkeypress="return soloLetras(event)">
+                </div>
+            </div> 
+
+            <div class="form-group">
+                <div class="input-group">
+                    <label>Teléfono</label>
+                </div> <!-- input-group.// -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txttel">
+                </div>
+            </div> 
+
+            <div class="form-group">
+                <div class="input-group">
+                    <label>Email</label>
+                </div> <!-- input-group.// -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txtemail">
+                </div>
+            </div> 
+
+            <div class="form-group">
+            <button type="button" id="btnagendar2"  class="btn btn-primary btn-block">Siguiente <i class="far fa-check-circle"></i></button>
+            </div> <!-- form-group// -->
+
+            </form>
+        </article>
+        </aside>
+    </div>
+</div> 
+
+<script src="http://code.jquery.com/jquery-2.1.3.js"></script>
+<script>
+    $(document).ready(function() {
+
+
+        const base_url = 'http://localhost:3000/';
+
+        function getUrlVars() {
+          var vars = {};
+          var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+          function(m,key,value) {
+          vars[key] = value;
+          });
+          return vars;
+        }
+
+        var rut_ = getUrlVars()["rutpac"];
+        var idprof = getUrlVars()["idprof"];
+        var idbloque = getUrlVars()["idbloque"];
+
+        var rut = rut_.substring(0,-2);
+        var rut_dig = rut.charAt(rut.length -1);
+
+        //carga datos datos del paciente
+        /*$.ajax({
+            type: 'get',
+            url: base_url + 'paciente/'+rut,
+            success: function(data){
+                $('#lblpac').html(data.pac[0].nombre +' '+ data.pac[0].a_pat+' '+ data.pac[0].a_mat);
+            },
+            error: function(){
+                console.log('error al traer datos del paciente');
+            }
+        }).done(function(){
+            //busca datos del profesional
+            $.ajax({
+                type: 'get',
+                url: base_url + 'prof/'+idprof,
+                success: function(data){
+                    $('#lblprof').html('Profesional :'+data.prof[0].nombre);
+
+                    //obtiene datos del bloque
+                    $.ajax({
+                        type: 'get',
+                        url: base_url + idbloque,
+                        success: function(data) {
+                            console.log('blo: '+ data );
+                            var d = Date(data.bloques[0].fecha);
+                            
+                            $('#lblbloque').html(data.bloques[0].fecha +', '+ data.bloques[0].horaini.substring(11,16));
+                        },
+                        error: function(){
+                            console.log('error al trear bloque');
+                        }
+                    });
+                },
+                error: function(){
+                    console.log('error al traer datos del paciente');
+                }
+            });
+        });*/
+
+
+        $('#btnagendar2').on('click', function() {
+
+            var nombre = document.getElementById("txtnombre").value;
+            var a_pat = document.getElementById("txtapat").value;
+            var a_mat = document.getElementById("txtamat").value;
+            var telefono = document.getElementById("txttel").value;
+            var email = document.getElementById("txtemail").value;
+
+            function getUrlVars() {
+                var vars = {};
+                var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+                function(m,key,value) {
+                vars[key] = value;
+                });
+                return vars;
+            }
+
+            var rut_ = getUrlVars()["rutpac"];
+            var idprof = getUrlVars()["idprof"];
+            var idbloque = getUrlVars()["idbloque"];
+
+            var rut = rut_.substring(0, rut_.length -2);
+            var rut_dig = rut.charAt(rut.length -1);
+            //console.log('rut: '+ rut + ' ' + 'digito: ' + rut_dig);
+
+            $.ajax({
+                type: 'post',
+                url: base_url + 'paciente/save',
+                data: {nombre: nombre, a_pat: a_pat, a_mat: a_mat, rut_num: rut ,rut_dig: rut_dig,telefono: telefono, email: email},
+                success: function(){
+                    console.log('paciente guardado');
+                    window.location.href = base_url + 'step5?rutpac='+ rut_ + '&idprof='+ idprof + '&idbloque=' + idbloque;
+                },
+                error: function(){
+                    console.log('error al guardar paciente');
+                }
+            });
+        });
+
+    });
+</script>

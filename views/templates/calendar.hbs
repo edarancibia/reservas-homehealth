@@ -1,0 +1,146 @@
+<br>
+<div class="container">
+
+      <div class="stepwizard">
+        <div class="stepwizard-row setup-panel">
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle">1</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">2</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-success btn-circle" disabled="disabled">3</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">4</a>
+                
+            </div>
+        </div>
+    </div>
+  <div class="row justify-content-md-center align-items-center">
+    <aside class="col-sm-4">
+      <article class="card-body ">
+        <form>
+          <div class="form-group">
+            <div id="wrapper" class="ui-widget">
+              <label for="fecha">Seleccione fecha</label><span id="fecha"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <table class="table" id="table-events"></table>
+          </div>
+        </form>
+      </article>
+    </aside>
+  </div>
+</div>
+
+<script src="http://code.jquery.com/jquery-2.1.3.js"></script>
+<script>
+$(document).ready(function() {
+  const base_url = 'http://localhost:3000/';
+  var existe;
+
+    $.datepicker.regional['es'] = {
+        closeText: 'Cerrar',
+        prevText: '< Ant',
+        nextText: 'Sig >',
+        currentText: 'Hoy',
+        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+        weekHeader: 'Sm',
+        dateFormat: 'yy-mm-dd',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: ''
+        };
+        $.datepicker.setDefaults($.datepicker.regional['es']);
+        $(function () {
+        $("#fecha").datepicker();
+      });    
+
+    $('#fecha').datepicker(); 
+
+   $(document).on("change", "#fecha", function () {
+      //alert($(this).val())
+      var fecha = $(this).val();
+
+      function getUrlVars() {
+          var vars = {};
+          var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+          function(m,key,value) {
+          vars[key] = value;
+          });
+          return vars;
+      }
+
+      var rut = getUrlVars()["rutpac"];
+      var idprof = getUrlVars()["idprof"];
+      var esp = getUrlVars()["esp"];
+      var urlStep4;
+
+      $.ajax({
+        type: 'get',
+        url: base_url + 'paciente/'+rut,
+        success: function(data){
+          console.log(data);
+          if(data.pac[0] == null){
+            existe = 0;
+          } else {
+            existe = 1;
+          }
+
+          console.log(existe);
+
+          //valida si el paciente existe
+          if (existe == 1) {
+            urlStep4 = base_url + 'step4?rutpac='+rut+'&idprof='+idprof;
+          } else {
+            urlStep4 = base_url + 'step4v2?rutpac='+rut+'&idprof='+idprof;
+          }
+
+        },
+        error: function(){
+          console.log('error al validar paciente');
+          urlStep4 = base_url + 'step4v2?rutpac='+rut+'&idprof='+idprof;
+        }
+      }).done(function() {
+          $.ajax({
+            type: 'get',
+            url: base_url + 'list/'+fecha+'/'+idprof.slice(0,-2),
+            success: function(d){
+
+              var data =jQuery.parseJSON(JSON.stringify(d));
+              console.log(data);
+              $('#table-events tr').remove();
+              $.each(data.bloques, function(i, item){
+                        $('<tr>').html(
+                            //  "<td><button type='button' id='btnbloque' data="+data.bloques[0].idbloque+" class='btn btn-info'>"+data.bloques[i].horaini.substring(11,16)+"</button></td>"+
+                            "<td><a href="+urlStep4+'&idbloque='+data.bloques[i].idbloque+" id='btnbloque' data="+data.bloques[i].idbloque+" class='btn btn-info'>"+data.bloques[i].horaini.substring(11,16)+"</a></td>"+
+                        "</tr>").appendTo('#table-events');
+                  });
+            },
+            error: function(){
+              console.log('error al traer bloques');
+            }
+        });
+      });
+
+    });
+
+    $('#btnbloque').on('click', function(){
+      alert('click');
+    });
+
+});
+</script>
+

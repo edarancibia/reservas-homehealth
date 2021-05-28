@@ -1,0 +1,131 @@
+<div class="container">
+    <div class="stepwizard">
+        <div class="stepwizard-row setup-panel">
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle">1</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">2</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">3</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-success btn-circle" disabled="disabled">4</a>
+                
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-md-center align-items-center">
+        <aside class="col-sm-4">
+        <article class="card-body ">
+            <h4 class="card-title text-center mb-4 mt-1" id="lblpac"></h4>
+            <form>
+            <div class="form-group">
+            <div class="input-group">
+                <label id="lblprof" ></label>
+            </div> <!-- input-group.// -->
+            <div class="input-group">
+                <label id="lblbloque"></label>
+            </div>
+            </div> <!-- form-group// -->
+
+            <div class="form-group">
+            <button type="button" id="btnagendar"  class="btn btn-primary btn-block">Agendar <i class="far fa-check-circle"></i></button>
+            </div> <!-- form-group// -->
+
+            </form>
+        </article>
+        </aside>
+    </div>
+</div> 
+
+<script src="http://code.jquery.com/jquery-2.1.3.js"></script>
+<script>
+    $(document).ready(function() {
+        const base_url = 'http://localhost:3000/';
+
+        function getUrlVars() {
+          var vars = {};
+          var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+          function(m,key,value) {
+          vars[key] = value;
+          });
+          return vars;
+        }
+
+        var rut = getUrlVars()["rutpac"];
+        var idprof = getUrlVars()["idprof"];
+        var idbloque = getUrlVars()["idbloque"];
+
+
+        //carga datos datos del paciente
+        $.ajax({
+            type: 'get',
+            url: base_url + 'paciente/'+rut,
+            success: function(data){
+                $('#lblpac').html(data.pac[0].nombre +' '+ data.pac[0].a_pat+' '+ data.pac[0].a_mat);
+            },
+            error: function(){
+                console.log('error al traer datos del paciente');
+            }
+        }).done(function(){
+            //busca datos del profesional
+            $.ajax({
+                type: 'get',
+                url: base_url + 'prof/'+idprof,
+                success: function(data){
+                    $('#lblprof').html('Profesional :'+data.prof[0].nombre);
+
+                    //obtiene datos del bloque
+                    $.ajax({
+                        type: 'get',
+                        url: base_url + idbloque,
+                        success: function(data) {
+                            console.log('blo: '+ data );
+                            var d = Date(data.bloques[0].fecha);
+
+                            var fecha = new Date(data.bloques[0].fecha);
+                            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+                            console.log(
+                                fecha.toLocaleDateString("es-ES", options)
+                            );
+                            
+                            $('#lblbloque').html(fecha.toLocaleDateString("es-ES", options) +', '+ data.bloques[0].horaini.substring(11,16));
+                        },
+                        error: function(){
+                            console.log('error al trear bloque');
+                        }
+                    });
+                },
+                error: function(){
+                    console.log('error al traer datos del paciente');
+                }
+            });
+        });
+
+
+        $('#btnagendar').on('click', function() {
+            
+            $.ajax({
+                type: 'post',
+                url: base_url + 'save/'+idbloque,
+                data: {rutpac: rut},
+                success: function(){
+                    console.log('agendado');
+                },
+                error: function(){
+                    console.log('error al agendar');
+                }
+            }).done(function() {
+                console.log('aqui');
+                window.location.href = base_url + 'ok';
+            });
+        });
+
+    });
+</script>

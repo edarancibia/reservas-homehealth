@@ -1,0 +1,107 @@
+<div class="container">
+
+    <div class="stepwizard">
+        <div class="stepwizard-row setup-panel">
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle">1</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-success btn-circle" disabled="disabled">2</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">3</a>
+                
+            </div>
+            <div class="stepwizard-step col-xs-3"> 
+                <a href="#" type="button" class="btn btn-primary btn-circle" disabled="disabled">4</a>
+                
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-md-center align-items-center">
+        <aside class="col-sm-4">
+        <article class="card-body ">
+            <h4 class="card-title text-center mb-4 mt-1">Seleccione especialidad</h4>
+            <form>
+            <div class="form-group">
+            <div class="input-group">
+                <select name="cboespe" id="cboespe" class="form-control">
+                    <option value="">SELECCIONE</option>
+                    <option value="MED">MEDICO</option>
+                    <option value="ENF">ENFERMERÍA</option>
+                    <option value="KIN">KINESIOLOGÍA</option>
+                    <option value="POD">PODOLOGÍA</option>
+                    <option value="NUT">NUTRICIONISTA</option>
+                </select>
+            </div> <!-- input-group.// -->
+            </div> <!-- form-group// -->
+
+            </form>
+        </article>
+
+        <article class="card-body ">
+            <h4 class="card-title text-center mb-4 mt-1">Seleccione Profesional</h4>
+            <form>
+            <div class="form-group">
+            <div class="input-group">
+                <select name="cboprof" id="cboprof" class="form-control">
+                   
+                </select>
+            </div> <!-- input-group.// -->
+            </div> <!-- form-group// -->
+
+            <div class="form-group">
+            <a href="#" class="btn btn-primary btn-block" onclick="getesp();">Siguiente</a>
+            </div> <!-- form-group// -->
+
+            </form>
+        </article>
+        </aside>
+    </div>
+</div> 
+<script src="http://code.jquery.com/jquery-2.1.3.js"></script>
+<script>
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+        function(m,key,value) {
+        vars[key] = value;
+        });
+        return vars;
+    }
+
+    function getesp(){
+        var rut = getUrlVars()["rutpac"];
+        var esp = document.getElementById('cboespe').value;
+        var idprof = document.getElementById('cboprof').value;
+        window.location.href = 'http://localhost:3000/calendar?rutpac='+rut+'&esp='+esp+'&idprof='+idprof;
+    }
+
+$(document).ready(function(){
+    var esp;
+
+    $('#cboespe').change(function() {
+        esp = $('#cboespe').val();
+        getProfesionales(esp);
+    });
+
+    function getProfesionales(esp){
+        $.ajax({
+            type: 'get',
+            url: 'http://localhost:3000/profs/'+ esp,
+            success: function(data){
+                $('#cboprof').empty();
+                $.each(data.profs,function(i, item){
+                    console.log(item.rutnum);
+                    $('#cboprof').append('<option value="0" selected disabled hidden>Seleccione</option>'+'<option value='+item.rutnum+'>'+item.nombre+'</option>');
+                });
+            },
+            error: function(){
+                console.log('error al trear profesionales');
+            }
+        });
+    }
+});
+</script>
